@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController,UITextFieldDelegate {
     
     var accountInfo:[AccountIfno] = []
+    let app = UIApplication.shared.delegate as! AppDelegate
     
     @IBOutlet weak var logoImage: UIImageView!
 
@@ -84,53 +85,63 @@ class ViewController: UIViewController,UITextFieldDelegate {
     
     //傳值給後台 並接受後台回傳資料 驗證帳號密碼是否存在
     private func loginMember() {
-        let account:String = accountTextField.text!
-        let password:String = passwordTextField.text!
-        let url = URL(string: "http://www.brad.tw/cloudfitness.php?")
-        var request = URLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
-        request.httpBody = "account=\(account)&passwd=\(password)" .data(using: .utf8)
-        request.httpMethod = "POST"
+        let account = accountTextField.text
+        let passwd = passwordTextField.text
         
-        let config = URLSessionConfiguration.default
-        let session = URLSession(configuration: config)
-        let dataTask = session.dataTask(with: request){(data, response, error)in
-            if let data = data {
-                let source = String(data: data, encoding: .utf8)
-                print(source)
-                //後台回傳的值(true)
-                if source! == "0" {
-//                    print(source!)
-//                    print("pass")
-                    goNextPage()
-                }else{
-                //後台回傳的值(false)
-                    print("XX")
-                    DispatchQueue.main.async {
+        let urlString = "http://www.brad.tw/cloudfitness/login.php?account=\(account!)&passwd=\(passwd!)"
+        
+        let url = URL(string: urlString)
+        
+        if let source = try? Data(contentsOf: url!){
+            do{
+                if let jsonObj = try? JSONSerialization.jsonObject(with: source, options: .allowFragments) {
+                    
+                    let allObj = jsonObj as! [String:String]
+                    if allObj["result"] == "0" || allObj["result"] == "1"{
+                        app.mid = allObj["id"]!
+                        goNextPage()
+                        
+                    }
+                    if allObj["result"] == "-3" {
                         accountNotExist()
                     }
+                
                 }
+            }catch{
+                print(error)
             }
         }
-        dataTask.resume()
+        
+//        let urlString = "http://www.brad.tw/cloudfitness/login.php"
+//        let url = URL(string: urlString)
+//        var request = URLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
+//        request.httpBody = "account=\(account!)&passwd=\(passwd!)" .data(using: .utf8)
+//        request.httpMethod = "POST"
+//        
+//        let config = URLSessionConfiguration.default
+//        let session = URLSession(configuration: config)
+//        let dataTask = session.dataTask(with: request){(data, response, error)in
+//            do{
+//                if let jsonObj = try? JSONSerialization.jsonObject(with: data!, options: .allowFragments) {
+//                    
+//                    let allObj = jsonObj as! [String:String]
+//                    print(allObj)
+//                    if allObj["result"] == "0" || allObj["result"] == "1"{
+//                        self.app.mid = allObj["id"]!
+//                        goNextPage()
+//                    }else {
+//                        accountNotExist()
+//                        
+//                    }
+//                    
+//                }
+//            }catch{
+//                print(error)
+//            }
+//        }
+//dataTask.resume()
         //跳下一頁
-        func goNextPage(){
-            let vc = storyboard?.instantiateViewController(withIdentifier: "ChoiceDeviceVC")
-            show(vc!, sender: self)
-        }
-        //判斷帳號是否存在的Alert視窗
-        func accountNotExist(){
-            //建立一個 Alert 視窗
-            let alertController = UIAlertController(title: "Warning", message: "Account is not exist", preferredStyle: .alert)
-            //建立一個按鈕
-            let confirm = UIAlertAction(title: "Continue", style: .default, handler: {(action)in
-                //self.dismiss(animated: true, completion: nil)
-            })
-            //把按鈕加進 Alert 視窗
-            alertController.addAction(confirm)
-            //呈現 Alert 視窗
-            present(alertController, animated: true, completion: nil)
 
-        }
     }
     
     
@@ -239,6 +250,23 @@ class ViewController: UIViewController,UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    
+    func goNextPage(){
+        let vc = storyboard?.instantiateViewController(withIdentifier: "ChoiceDeviceVC")
+        show(vc!, sender: self)
+    }
+    //判斷帳號是否存在的Alert視窗
+    func accountNotExist(){
+        //建立一個 Alert 視窗
+        let alertController = UIAlertController(title: "Warning", message: "Please check password", preferredStyle: .alert)
+        //建立一個按鈕
+        let confirm = UIAlertAction(title: "OK", style: .default, handler: {(action)in
+            //self.dismiss(animated: true, completion: nil)
+        })
+        //把按鈕加進 Alert 視窗
+        alertController.addAction(confirm)
+        //呈現 Alert 視窗
+        present(alertController, animated: true, completion: nil)
+        
+    }
 }
 

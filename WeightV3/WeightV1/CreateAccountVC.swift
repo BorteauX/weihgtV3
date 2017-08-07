@@ -11,6 +11,7 @@ import UIKit
 class CreateAccountVC: UIViewController {
 
     var accountInfo:Dictionary<String,String> = [:]
+    let app = UIApplication.shared.delegate as! AppDelegate
     @IBOutlet weak var LogoImg: UIImageView!
     
     @IBOutlet weak var createNewAccountLabel: UILabel!
@@ -36,9 +37,9 @@ class CreateAccountVC: UIViewController {
     
     @IBAction func continueBtn(_ sender: Any) {
 // 
-        if noText() == true {
-            return
-        }
+//        if noText() == true {
+//            return
+//        }
 //        if  !isPasswordValid(newPasswordTextField.text!) {
 //            print("XX")
 //            return
@@ -126,31 +127,12 @@ class CreateAccountVC: UIViewController {
         return isSame
     }
     //輸入字元字數限制
-//    func isPasswordValid(_ password : String) -> Bool{
-//        let passwordTest = NSPredicate(format: "SELF MATCHES %@", "^(?=.*[a-z])(?=.*[$@$#!%*?&])[A-Za-z\\d$@$#!%*?&]{8,}")
-//        return passwordTest.evaluate(with: password)
-//    }
-//    
+    func isPasswordValid(_ password : String) -> Bool{
+        let passwordTest = NSPredicate(format: "SELF MATCHES %@", "^(?=.*[a-z])(?=.*[$@$#!%*?&])[A-Za-z\\d$@$#!%*?&]{8,}")
+        return passwordTest.evaluate(with: password)
+    }
     
     
-//    private func parseJson(json:Data){
-//        do{
-//            if let jsonObj = try? JSONSerialization.jsonObject(with: json, options: .allowFragments) {
-//                let allObj = jsonObj as! [[String: AnyObject]]
-//                print(allObj.count)
-//                for r in allObj  {
-//                    let account = AccountIfno()
-//                    account.result = r["result"]                   as! String
-//                    account.id = r["id"]                   as! String
-//                    self.accountInfo.append(account)
-//                }
-//            }
-//        }catch{
-//            print(error)
-//        }
-//        
-//    }
-
     // Get 傳值給後台
     private func addMember() -> Bool {
         var isAdd:Bool = true
@@ -160,42 +142,36 @@ class CreateAccountVC: UIViewController {
             let email = newEmailTextField.text
             
             let urlString = "http://www.brad.tw/cloudfitness/login.php?account=\(account!)&passwd=\(passwd!)"
-    
+            
             let url = URL(string: urlString)
             
             if let source = try? Data(contentsOf: url!){
                 do{
                     if let jsonObj = try? JSONSerialization.jsonObject(with: source, options: .allowFragments) {
-                        let allObj = jsonObj as! [[String:String]]
-                        for r in allObj  {
-                            var account = accountInfo
-                            account = r["result"]
                         
+                        let allObj = jsonObj as! [String:String]
+                        if allObj["result"] == "0" || allObj["result"] == "1"{
+                           app.mid = allObj["id"]!
                             
                             
                             
-                            if account == ["result" : "1"] {
-                            print("Add OK")
-                            DispatchQueue.main.async {
-                            self.addAccess()
-                                }
-                
-                                }else {
-                                    print("Add Fail")
-                            }
+                            
+                        }else {
+                            
+                            
+                            
+                            
                         }
+
                     }
                 }catch{
                     print(error)
                 }
-                
-                
             }
-
-            }
+            
+        }
         return isAdd
     }
-    
     //創建成功Alert
     private func addAccess()  {
             let alertController = UIAlertController(title: "", message: "Add member access!", preferredStyle: .alert)

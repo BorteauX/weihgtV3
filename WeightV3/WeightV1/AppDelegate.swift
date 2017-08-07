@@ -16,12 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //    var charDictionary = [String: CBCharacteristic]()
     //    var peripherals = Array<CBPeripheral>()
     var bleManage:BLEManage!
+    var mid = ""
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         //        let queue = DispatchQueue.global()
         //        centralManager = CBCentralManager(delegate: self, queue: queue)
-        bleManage = BLEManage()
+        //bleManage = BLEManage()
         return true
     }
     

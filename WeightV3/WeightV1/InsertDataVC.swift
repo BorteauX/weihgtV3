@@ -9,7 +9,7 @@
 import UIKit
 
 class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UIPickerViewDataSource {
-    
+    var userDef : UserDefaults!
     @IBOutlet weak var insertDataLabel: UILabel!
     
     @IBOutlet weak var heightLabel: UILabel!
@@ -43,6 +43,10 @@ class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UI
     @IBOutlet weak var backBtn: UIButton!
     
     @IBAction func backBtnAction(_ sender: Any) {
+        app.bleManage.centralManager.cancelPeripheralConnection(app.bleManage.connectPeripheral)
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "ChoiceDeviceVC"){
+            show(vc, sender: self)
+        }
     }
     
     @IBAction func nextPageBtn(_ sender: Any) {
@@ -69,6 +73,11 @@ class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UI
         app.body["height"] = UInt8(heightTextField.text!) //UInt8(tallLabel.text!)
         app.body["age"] = age //UInt8(birthYearLabel.text!)
         print(age!)
+        userDef.setValue(app.body["gender"], forKey: "gender")
+        userDef.setValue(heightTextField.text!, forKey: "height")
+        userDef.setValue(app.body["age"], forKey: "age")
+
+
         app.bleManage.writeBody(body: app.body)
         if let vc = storyboard?.instantiateViewController(withIdentifier: "ResultVC"){
             show(vc, sender: self)
@@ -122,7 +131,6 @@ class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UI
     //picker 文字樣式
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = (view as? UILabel) ?? UILabel()
-        
         label.textColor = .white
         label.textAlignment = .center
         label.font = UIFont.boldSystemFont(ofSize: 20)
@@ -131,6 +139,7 @@ class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UI
         
         return label
     }
+    
     
     
     // 結束編輯 把鍵盤隱藏起來
@@ -193,10 +202,10 @@ class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UI
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+        //birthYearPickerView.selectRow(10, inComponent: 10, animated: false)
+        userDef = UserDefaults.standard
         showbirthYear()
-        age = 99
+        //age = 99
         
         //View背景顏色
         //背景漸層的兩個漸層顏色
@@ -218,6 +227,12 @@ class InsertDataVC: UIViewController,UITextFieldDelegate,UIPickerViewDelegate,UI
     
     override func viewWillAppear(_ animated: Bool) {
         //偵測不同裝置變換文字大小
+        print(userDef.value(forKey: "gender"))
+        birthYearPickerView.selectRow(50, inComponent: 0, animated: true)
+        age = UInt8(currentYear() - Int(birthYear[50])!)
+        heightTextField.text = userDef.value(forKey: "height") as! String ?? ""
+        print(userDef.value(forKey: "height"))
+        
         switch traitCollection.userInterfaceIdiom{
         case .phone:
             insertDataLabel.font = UIFont.systemFont(ofSize: 36)

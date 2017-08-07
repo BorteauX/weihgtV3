@@ -162,7 +162,7 @@ class BLEManage: NSObject,CBCentralManagerDelegate,CBPeripheralDelegate {
         var param : Array<UInt8> = Array(repeating: 0, count: 14)
         param[0] = 0x5A;
         param[1] = 0xd5;
-        param[2] = 1;   //用户组1，1~8
+        param[2] = 5;   //用户组1，1~8
         param[3] = body["age"]!;  //年齡18-99
         param[4] = body["gender"]!;   //性別：女0 男1
         param[5] = 2;  // 身高单位 1 ~ inch  2 ~ cm

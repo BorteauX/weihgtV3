@@ -19,7 +19,8 @@ class ChoiceDeviceVC: UIViewController ,UITableViewDelegate,UITableViewDataSourc
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        app.bleManage = BLEManage()
+        print(app.mid)
         Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: {(timer) in
             self.tableView.reloadData()
         })

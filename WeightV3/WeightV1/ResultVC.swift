@@ -24,6 +24,9 @@ class ResultVC: UIViewController ,UITableViewDelegate,UITableViewDataSource{
     @IBOutlet weak var uploadLabel: UIButton!
     @IBOutlet weak var logOutLabel: UIButton!
     @IBAction func editBtn(_ sender: Any) {
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "InsertData"){
+            show(vc, sender: self)
+        }
     }
     
     @IBAction func uploadBtn(_ sender: Any) {
@@ -31,8 +34,25 @@ class ResultVC: UIViewController ,UITableViewDelegate,UITableViewDataSource{
     
     @IBOutlet weak var logOutBtn: UIButton!
 
+    
+    private func stand() {
+        //建立一個 Alert 視窗
+        let alertController = UIAlertController(title: "！", message: "Please stand on your weight meter", preferredStyle: .alert)
+        //建立一個按鈕
+        let confirm = UIAlertAction(title: "OK", style: .default, handler: {(action)in
+            //self.dismiss(animated: true, completion: nil)
+        })
+        //把按鈕加進 Alert 視窗
+        alertController.addAction(confirm)
+        //呈現 Alert 視窗
+        present(alertController, animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        //站上體重計提示視窗
+        stand()
+        
         //顯示預設體重
         weightLabel.text = "0.0 kg"
         
@@ -64,6 +84,8 @@ class ResultVC: UIViewController ,UITableViewDelegate,UITableViewDataSource{
                 //timer.invalidate()
             }
         })
+        
+        
         
     }
 
